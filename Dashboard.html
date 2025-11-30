@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Distribution Dashboard | Favosdia Memoir</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4A44C6;
+            --accent: #FF6584;
+            --dark: #2A2D3E;
+            --light: #F7F9FC;
+            --gray: #9A9EAE;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --danger: #F44336;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background-color: rgba(247, 249, 252, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        nav a.active {
+            color: var(--primary);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(108, 99, 255, 0.2);
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-title h1 {
+            font-size: 2.5rem;
+            color: var(--dark);
+        }
+
+        .dashboard-title p {
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .dashboard-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--primary);
+        }
+
+        .stat-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .icon-primary {
+            background: var(--primary);
+        }
+
+        .icon-success {
+            background: var(--success);
+        }
+
+        .icon-warning {
+            background: var(--warning);
+        }
+
+        .icon-danger {
+            background: var(--danger);
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-negative {
+            color: var(--danger);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Products Table */
+        .products-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            margin-bottom: 50px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+        }
+
+        .filter-select {
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table th {
+            text-align: left;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .products-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .product-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .product-name {
+            font-weight: 500;
+        }
+
+        .product-sku {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .status-low {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .status-out {
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .progress-high {
+            background: var(--success);
+        }
+
+        .progress-medium {
+            background: var(--warning);
+        }
+
+        .progress-low {
+            background: var(--danger);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 50px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column a {
+            color: #B0B3C1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column a:hover {
+            color: white;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .social-icons a:hover {
+            background: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #B0B3C1;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            nav {
+                display: none;
+            }
+            
+            .dashboard-title h1 {
+                font-size: 2rem;
+            }
+            
+            .filters {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .products-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-book"></i>
+                    <span>Favosdia Memoir</span>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="dashboard.html" class="active">Dashboard</a></li>
+                        <li><a href="#">Products</a></li>
+                        <li><a href="#">Distribution</a></li>
+                        <li><a href="#">Analytics</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-user-circle"></i> My Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard -->
+    <section class="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <div class="dashboard-title">
+                    <h1>Product Distribution Dashboard</h1>
+                    <p>Monitor and manage your product distribution across all channels</p>
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-outline btn-icon">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                    <button class="btn btn-primary btn-icon">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card fade-in">
+                    <div class="stat-info">
+                        <div>
+                            <div class="stat-value">1,248</div>
+                            <div class="stat-label">Total Products</div>
+                            <div class="stat-change change-positive">
+                                <i class="fas fa-arrow-up"></i> 12% from last month
+                            </div>
+                        </div>
+                        <div class="stat-icon icon-primary">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-info">
+                        <div>
+                            <div class="stat-value">86%</div>
+                            <div class="stat-label">Distribution Rate</div>
+                            <div class="stat-change change-positive">
+                                <i class="fas fa-arrow-up"></i> 5% from last month
+                            </div>
+                        </div>
+                        <div class="stat-icon icon-success">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-info">
+                        <div>
+                            <div class="stat-value">$24,580</div>
+                            <div class="stat-label">Monthly Revenue</div>
+                            <div class="stat-change change-positive">
+                                <i class="fas fa-arrow-up"></i> 8% from last month
+                            </div>
+                        </div>
+                        <div class="stat-icon icon-warning">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card fade-in">
+                    <div class="stat-info">
+                        <div>
+                            <div class="stat-value">47</div>
+                            <div class="stat-label">Pending Orders</div>
+                            <div class="stat-change change-negative">
+                                <i class="fas fa-arrow-down"></i> 3% from last month
+                            </div>
+                        </div>
+                        <div class="stat-icon icon-danger">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card fade-in">
+                    <div class="chart-header">
+                        <div class="chart-title">Distribution Performance</div>
+                        <div class="chart-actions">
+                            <select class="filter-select">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 3 months</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card fade-in">
+                    <div class="chart-header">
+                        <div class="chart-title">Inventory Status</div>
+                        <div class="chart-actions">
+                            <select class="filter-select">
+                                <option>All Categories</option>
+                                <option>Electronics</option>
+                                <option>Fashion</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="inventoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="products-section fade-in">
+                <div class="section-header">
+                    <div class="section-title">Product Distribution</div>
+                    <div class="filters">
+                        <select class="filter-select">
+                            <option>All Status</option>
+                            <option>Active</option>
+                            <option>Low Stock</option>
+                            <option>Out of Stock</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Channels</option>
+                            <option>Website</option>
+                            <option>Amazon</option>
+                            <option>Ebay</option>
+                        </select>
+                        <input type="text" class="filter-select" placeholder="Search products...">
+                    </div>
+                </div>
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Status</th>
+                            <th>Inventory</th>
+                            <th>Distribution</th>
+                            <th>Revenue</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    <div class="product-image">
+                                        <i class="fas fa-laptop"></i>
+                                    </div>
+                                    <div>
+                                        <div class="product-name">Premium Laptop</div>
+                                        <div class="product-sku">SKU: LP-001</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>LP-001</td>
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+                            <td>
+                                <div>142/200</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-high" style="width: 71%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>86%</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-high" style="width: 86%"></div>
+                                </div>
+                            </td>
+                            <td>$1,240</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="action-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div class="action-btn">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    <div class="product-image">
+                                        <i class="fas fa-mobile-alt"></i>
+                                    </div>
+                                    <div>
+                                        <div class="product-name">Smartphone X</div>
+                                        <div class="product-sku">SKU: SP-005</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>SP-005</td>
+                            <td>
+                                <span class="status-badge status-low">Low Stock</span>
+                            </td>
+                            <td>
+                                <div>18/100</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-low" style="width: 18%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>92%</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-high" style="width: 92%"></div>
+                                </div>
+                            </td>
+                            <td>$3,150</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="action-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div class="action-btn">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    <div class="product-image">
+                                        <i class="fas fa-headphones"></i>
+                                    </div>
+                                    <div>
+                                        <div class="product-name">Wireless Headphones</div>
+                                        <div class="product-sku">SKU: WH-012</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>WH-012</td>
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+                            <td>
+                                <div>75/150</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-medium" style="width: 50%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>78%</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-medium" style="width: 78%"></div>
+                                </div>
+                            </td>
+                            <td>$890</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="action-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div class="action-btn">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    <div class="product-image">
+                                        <i class="fas fa-tablet-alt"></i>
+                                    </div>
+                                    <div>
+                                        <div class="product-name">Tablet Pro</div>
+                                        <div class="product-sku">SKU: TB-008</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>TB-008</td>
+                            <td>
+                                <span class="status-badge status-out">Out of Stock</span>
+                            </td>
+                            <td>
+                                <div>0/80</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-low" style="width: 0%"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>45%</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill progress-low" style="width: 45%"></div>
+                                </div>
+                            </td>
+                            <td>$0</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <div class="action-btn">
+                                        <i class="fas fa-edit"></i>
+                                    </div>
+                                    <div class="action-btn">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Favosdia Memoir</h3>
+                    <p style="color: #B0B3C1; line-height: 1.6;">The ultimate tool for tracking product distribution and keeping detailed notes for your e-commerce business.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Product</h3>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Integrations</a></li>
+                        <li><a href="#">Updates</a></li>
+                        <li><a href="#">Download</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Server Status</a></li>
+                        <li><a href="#">Report a Bug</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Favosdia Memoir. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize animations when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Stats cards animation
+            anime({
+                targets: '.stat-card',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: anime.stagger(100),
+                easing: 'easeOutCubic'
+            });
+            
+            // Chart cards animation
+            anime({
+                targets: '.chart-card',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: 300,
+                easing: 'easeOutCubic'
+            });
+            
+            // Products table animation
+            anime({
+                targets: '.products-section',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: 500,
+                easing: 'easeOutCubic'
+            });
+            
+            // Table rows animation
+            anime({
+                targets: '.products-table tbody tr',
+                translateX: [-50, 0],
+                opacity: [0, 1],
+                duration: 600,
+                delay: anime.stagger(100),
+                easing: 'easeOutCubic'
+            });
+            
+            // Initialize charts
+            initCharts();
+            
+            // Scroll animations
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            translateY: [50, 0],
+                            opacity: [0, 1],
+                            duration: 800,
+                            easing: 'easeOutCubic'
+                        });
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe elements with fade-in class
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        });
+
+        // Initialize charts
+        function initCharts() {
+            // Distribution Performance Chart
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            const distributionChart = new Chart(distributionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [
+                        {
+                            label: 'Website',
+                            data: [65, 78, 66, 74, 82, 85, 90],
+                            borderColor: '#6C63FF',
+                            backgroundColor: 'rgba(108, 99, 255, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Amazon',
+                            data: [45, 52, 68, 74, 78, 80, 85],
+                            borderColor: '#4A44C6',
+                            backgroundColor: 'rgba(74, 68, 198, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Ebay',
+                            data: [30, 40, 48, 55, 60, 65, 70],
+                            borderColor: '#FF6584',
+                            backgroundColor: 'rgba(255, 101, 132, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Inventory Status Chart
+            const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
+            const inventoryChart = new Chart(inventoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+                    datasets: [{
+                        data: [65, 20, 15],
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#FF9800',
+                            '#F44336'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
+</body>
+</html>
